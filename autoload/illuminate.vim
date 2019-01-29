@@ -107,6 +107,11 @@ fun! s:get_cur_word() abort
   let col = col('.') - 1
   if v:version < 800
     let word = expand('<cword>')
+    if word == ''
+      let word = ''
+    elseif match(strpart(line, col, 1), '\k') == -1
+      let word = ''
+    endif
   else
     let word = matchstr(line[:col], '\k*$') . matchstr(line[col:], '^\k*')[1:]
   endif
