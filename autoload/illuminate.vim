@@ -157,7 +157,15 @@ fun! s:get_cur_word() abort
 endf
 
 fun! s:wrap_word_in_pattern(word) abort
-  return '\<' + word + '\>'
+  using_patterns = get(g:, 'Illuminate_use_prefix_patterns', 0)
+  patterns = get(b:, 'Illuminate_prefix_patterns', [])
+  if using_patterns || empty(patterns)
+    return '\v<' + word + '>'
+  endif
+  " for each pattern construct one ore statement
+  let pattern_str = '(' . join(patterns, '|') . ')'
+  word = replace(word, '\v^' . pattern_str, '')
+  return '\v<' .  pattern_str . '@<=' . word'>'
 endf
 
 fun! s:remove_illumination() abort
