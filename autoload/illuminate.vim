@@ -162,23 +162,23 @@ fun! s:get_cur_word() abort
   return word
 endf
 
-"  test only functions - used in unit testing mainly {{{
-fun! illuminate#_get_cur_word() abort
-  return s:get_cur_word()
-endf
-
-fun! illuminate#_wrap_word_in_pattern(word) abort
-  return s:wrap_word_in_pattern(a:word)
-endf
-" }}}
 
 fun! s:wrap_word_in_pattern(word) abort
   using_patterns = g:Illuminate_use_prefix_patterns
   patterns = get(b:, 'Illuminate_prefix_patterns', [])
   if using_patterns || empty(patterns)
-    return '\v<' + a:word + '>'
+    return s:wrap_word_in_pattern_normal(a:word)
+  elseif
+    return s:wrap_word_in_pattern_use_prefix(a:word, patterns)
   endif
-  let pattern_str = '(' . join(patterns, '|') . ')'
+endf
+
+fun! s:wrap_word_in_pattern_normal(word) abort
+  return '\v<' + a:word + '>'
+endf
+
+fun! s:wrap_word_in_pattern_use_prefix(word, patterns) abort
+  let pattern_str = '(' . join(a:patterns, '|') . ')'
   word = substitute(a:word, '\v<' . pattern_str, '')
   " returned pattern to match is like (with very-magic option)
   " (<(p1|p2|p3...))@<=part_of_word_to_match>
@@ -223,3 +223,15 @@ endf
 " }}}
 
 " vim: foldlevel=1 foldmethod=marker
+"  test only functions - used in unit testing mainly {{{
+let s:__impl__ = {}
+fun! illuminate#__impl__()
+  return s:__impl__
+endf
+
+let s:__impl__.get_cur_word = funcref('s:get_cur_word')
+let s:__impl__.wrap_word_in_pattern_normal = funcref('s:wrap_word_in_pattern_normal')
+let s:__impl__.wrap_word_in_pattern_use_prefix = funcref('s:wrap_word_in_pattern_use_prefix')
+
+" }}}
+
