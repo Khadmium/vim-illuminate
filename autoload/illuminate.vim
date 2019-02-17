@@ -33,8 +33,8 @@ fun! s:illuminate_delay_implementation_timer(word) abort
     return
   endif
   if s:timer_id != -1
-    let s:timer_id = -1
     call timer_stop(s:timer_id)
+    let s:timer_id = -1
   endif
   let s:timer_id = timer_start(g:Illuminate_delay, funcref('s:illuminate_with_curr_word'))
 endf
@@ -60,10 +60,7 @@ fun! s:illuminate_delay_implementation_reltime(word) abort
     let s:reltime_sec = curr_reltime_sec
     return
   endif
-  if (s:previous_match !=# a:word)
-    call s:remove_illumination()
-    let s:previous_match = a:word
-  else
+  if s:previous_match ==# a:word
     return
   endif
   call s:illuminate(a:word)
@@ -79,8 +76,6 @@ fun! s:illuminate_delay_implementation_fallback(word) abort
   endif
   call s:illuminate(a:word)
 endf
-
-
 
 fun! illuminate#on_leaving_autocmds() abort
   if s:should_illuminate_file()
@@ -137,9 +132,9 @@ endf
 
 fun! s:match_word(word) abort
   if g:Illuminate_highlightUnderCursor
-    call matchadd('illuminatedWord', '\V' . a:word, s:priority, s:match_id)
+    let s:match_id = matchadd('illuminatedWord', '\V' . a:word, s:priority)
   else
-    call matchadd('illuminatedWord', '\V\(\k\*\%#\k\*\)\@\!\&' . a:word, s:priority, s:match_id)
+    let s:match_id = matchadd('illuminatedWord', '\V\(\k\*\%#\k\*\)\@\!\&' . a:word, s:priority)
   endif
 endf
 
@@ -189,8 +184,12 @@ fun! s:remove_illumination() abort
 endf
 
 fun! s:remove_match() abort
+  if !exists('s:match_id')
+    return
+  endif
   try
     call matchdelete(s:match_id)
+    unlet s:match_id
   catch /\v(E803|E802)/
   endtry
   let s:previous_match = ''
