@@ -166,17 +166,17 @@ endf
 let s:regex_escape_chars = '\?*.[]'
 
 fun! s:wrap_word_in_pattern_normal(word) abort
-  return '\c\<' . escape(a:word, s:regex_escape_chars) . '\>'
+  return '\C\<' . escape(a:word, s:regex_escape_chars) . '\>'
 endf
 
 fun! s:wrap_word_in_pattern_use_prefix(word, pattern) abort
-  let word = substitute(a:word, '\c\<' . a:pattern, '', '')
+  let word = substitute(a:word, '\C\<' . a:pattern, '', '')
   if word ==# a:word
     return s:wrap_word_in_pattern_normal(a:word)
   endif
   " returned pattern to match is like (with very-magic option)
   " (<(p1|p2|p3...))@<=part_of_word_to_match>
-  return '\c\(\<' .  a:pattern . '\)\@<=' . escape(word, s:regex_escape_chars) . '\>'
+  return '\C\(\<' .  a:pattern . '\)\@<=' . escape(word, s:regex_escape_chars) . '\>'
 endf
 
 fun! s:remove_illumination() abort
