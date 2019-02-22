@@ -66,6 +66,36 @@ words):
 >
     hi illuminatedWord cterm=underline gui=underline
 
+Illumination can be triggered with 3 modes. Mode determines how to trigger
+illumination. Default mode 0 means automatic feature detection. Value 1 forces
+timer usage. Value 2 forces illuminating only if delay between cursor moves is
+larger than predefinied threshold - `g:Illuminate_reltime_delay`. Value 3
+cases that illumination is triggered as soon as cursor moves.
+>
+    " forces measurement between cursor moves
+    let g:Illuminate_mode = 2
+
+To customize duration in mode with value 2 use following settings:
+>
+    " duration in seconds
+    let g:Illuminate_reltime_delay = 0.8
+
+Illumination can use prefixes patterns. To enable this behaviour use this:
+>
+    let g:Illuminate_use_prefix_pattern = 1
+
+To define pattern use buffer variable. For example for prefix `'\(m_\|l_\|c_\)'`
+holding cursor on `l_word` causes illumination of `word` part in occurences of
+`l_word`, `m_word`, `c_word`. Note that this setting applies only to current
+buffer.
+>
+    let b:Illuminate_prefix_pattern = '\(\m_\|l_\|c_\)'
+
+To define prefix for some filetype use following command:
+>
+    autocmd BufReadPost,BufNewFile *.filetype
+        \ let b:Illuminate_prefix_pattern = '\(\w_\)'
+
 
 COMMANDS                                             *illuminate-commands*
 =========================================================================
