@@ -3,7 +3,6 @@
 " Version: 0.4
 
 " Some local variables {{{
-let s:match_id = 1867
 let s:priority = -10
 let s:previous_match = ''
 let s:enabled = 1
@@ -132,9 +131,9 @@ endf
 
 fun! s:match_word(word) abort
   if g:Illuminate_highlightUnderCursor
-    let s:match_id = matchadd('illuminatedWord', '\V' . a:word, s:priority)
+    let w:match_id = matchadd('illuminatedWord', '\V' . a:word, s:priority)
   else
-    let s:match_id = matchadd('illuminatedWord', '\V\(\k\*\%#\k\*\)\@\!\&' . a:word, s:priority)
+    let w:match_id = matchadd('illuminatedWord', '\V\(\k\*\%#\k\*\)\@\!\&' . a:word, s:priority)
   endif
 endf
 
@@ -184,12 +183,12 @@ fun! s:remove_illumination() abort
 endf
 
 fun! s:remove_match() abort
-  if !exists('s:match_id')
+  if !exists('w:match_id')
     return
   endif
   try
-    call matchdelete(s:match_id)
-    unlet s:match_id
+    call matchdelete(w:match_id)
+    unlet w:match_id
   catch /\v(E803|E802)/
   endtry
   let s:previous_match = ''
