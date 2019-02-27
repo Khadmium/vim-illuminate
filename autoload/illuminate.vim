@@ -26,6 +26,12 @@ fun! illuminate#on_cursor_moved() abort
   call s:illuminate_delay_implementation(cur_word)
 endf
 
+if exists('*funcref')
+  let s:GetFuncref = function('funcref')
+else
+  let s:GetFuncref = function('function')
+endif
+
 fun! s:illuminate_delay_implementation_timer(word) abort
   if g:Illuminate_delay < 17
     call s:illuminate(a:word)
@@ -35,14 +41,9 @@ fun! s:illuminate_delay_implementation_timer(word) abort
     call timer_stop(s:timer_id)
     let s:timer_id = -1
   endif
-  let s:timer_id = timer_start(g:Illuminate_delay, funcref('s:illuminate_with_curr_word'))
+  let s:timer_id = timer_start(g:Illuminate_delay, s:GetFuncref('s:illuminate_with_curr_word'))
 endf
 
-if exists('*funcref')
-  let s:GetFuncref = function('funcref')
-elseif
-  let s:GetFuncref = function('function')
-endif
 
 fun! s:illuminate_with_curr_word(...) abort
   let cur_word = s:get_cur_word()
@@ -242,6 +243,13 @@ let s:__impl__.wrap_word_in_pattern_use_prefix = s:GetFuncref('s:wrap_word_in_pa
 
 " }}}
 
+if g:Illuminate_mode == 1 && !has('timers')
+  let g:Illuminate_mode = 3
+endif
+
+if g:Illuminate_mode == 2 && ( !has('reltime') || !exists('*reltimefloat') || !exists('*reltime') )
+  let g:Illuminate_mode = 3
+endif
 
 if g:Illuminate_mode == 1
   let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_timer')
@@ -256,7 +264,7 @@ else
   if has('timers')
     let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_timer')
     let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_timer')
-  elseif has('reltime')
+  elseif has('reltime') && exists('*reltimefloat') && exists('*reltime')
     let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_reltime')
     let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_timer')
   else
