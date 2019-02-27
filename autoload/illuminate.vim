@@ -38,6 +38,12 @@ fun! s:illuminate_delay_implementation_timer(word) abort
   let s:timer_id = timer_start(g:Illuminate_delay, funcref('s:illuminate_with_curr_word'))
 endf
 
+if exists('*funcref')
+  let s:GetFuncref = function('funcref')
+elseif
+  let s:GetFuncref = function('function')
+endif
+
 fun! s:illuminate_with_curr_word(...) abort
   let cur_word = s:get_cur_word()
   if (s:previous_match !=# cur_word)
@@ -230,32 +236,32 @@ fun! illuminate#__impl__()
   return s:__impl__
 endf
 
-let s:__impl__.get_cur_word = funcref('s:get_cur_word')
-let s:__impl__.wrap_word_in_pattern_normal = funcref('s:wrap_word_in_pattern_normal')
-let s:__impl__.wrap_word_in_pattern_use_prefix = funcref('s:wrap_word_in_pattern_use_prefix')
+let s:__impl__.get_cur_word = s:GetFuncref('s:get_cur_word')
+let s:__impl__.wrap_word_in_pattern_normal = s:GetFuncref('s:wrap_word_in_pattern_normal')
+let s:__impl__.wrap_word_in_pattern_use_prefix = s:GetFuncref('s:wrap_word_in_pattern_use_prefix')
 
 " }}}
 
 
 if g:Illuminate_mode == 1
-  let s:illuminate_delay_implementation = funcref('s:illuminate_delay_implementation_timer')
-  let s:remove_illumination_implementation = funcref('s:remove_illumination_implementation_timer')
+  let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_timer')
+  let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_timer')
 elseif g:Illuminate_mode == 2
-  let s:illuminate_delay_implementation = funcref('s:illuminate_delay_implementation_reltime')
-  let s:remove_illumination_implementation = funcref('s:remove_illumination_implementation_reltime')
+  let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_reltime')
+  let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_reltime')
 elseif g:Illuminate_delay == 3
-  let s:illuminate_delay_implementation = funcref('s:illuminate_delay_implementation_fallback')
-  let s:remove_illumination_implementation = funcref('s:remove_illumination_implementation_fallback')
+  let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_fallback')
+  let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_fallback')
 else
   if has('timers')
-    let s:illuminate_delay_implementation = funcref('s:illuminate_delay_implementation_timer')
-    let s:remove_illumination_implementation = funcref('s:remove_illumination_implementation_timer')
+    let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_timer')
+    let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_timer')
   elseif has('reltime')
-    let s:illuminate_delay_implementation = funcref('s:illuminate_delay_implementation_reltime')
-    let s:remove_illumination_implementation = funcref('s:remove_illumination_implementation_timer')
+    let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_reltime')
+    let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_timer')
   else
-    let s:illuminate_delay_implementation = funcref('s:illuminate_delay_implementation_fallback')
-    let s:remove_illumination_implementation = funcref('s:remove_illumination_implementation_fallback')
+    let s:illuminate_delay_implementation = s:GetFuncref('s:illuminate_delay_implementation_fallback')
+    let s:remove_illumination_implementation = s:GetFuncref('s:remove_illumination_implementation_fallback')
   endif
 end
 
